@@ -1,7 +1,7 @@
 import subprocess
 
 # Your project dependencies
-dependencies = ["express"]
+dependencies = ["express","splite3"]
 
 # Install project dependencies
 for dep in dependencies:
