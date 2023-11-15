@@ -10,7 +10,7 @@ const apiKey = '8036d6c72b5b8cc742c4dddd1c065316';
 // API endpoint to get weather forecast
 router.get('/weather/forecast', async (req, res) => {
   try {
-    const cityName = req.params.city;
+    const cityName = req.query.city;
     const days = req.query.days || 7; // default to a week
 
     const requestURL = `http://api.openweathermap.org/data/2.5/forecast?q=${cityName}&cnt=${days}&appid=${apiKey}`;
