@@ -1,7 +1,7 @@
 import subprocess
 
 # Your project dependencies
-dependencies = ["express","sqlite3"]
+dependencies = ["express", "sqlite3", "react", "axios", "cors"]
 
 # Install project dependencies
 for dep in dependencies:
