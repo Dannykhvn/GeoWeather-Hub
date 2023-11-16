@@ -1,10 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const apiRoutes = require('./routes/apiRoutes'); // Import your API routes
 const app = express();
 const PORT = process.env.PORT || 5000;
 const db = require('./config/db'); // Require the database connection
 require('./scripts/schema'); // Require the schema for initializing tables
+
+app.use(cors());
 
 // Middleware
 app.use(bodyParser.json());
