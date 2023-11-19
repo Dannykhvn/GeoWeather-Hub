@@ -1,15 +1,15 @@
 import './App.css';
 import React from 'react';
-import WeatherController from './weatherContoller'; // Adjust the path
+import WeatherController from './weatherController'; 
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>GeoWeather Hub</h1>
-      </header>
       <main>
-        <WeatherController />
+        <div className="bg-image">
+            <WeatherController />
+        </div>
       </main>
     </div>
   );
