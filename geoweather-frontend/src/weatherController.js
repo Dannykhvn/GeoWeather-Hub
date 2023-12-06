@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "./weatherController.css";
+import { useNavigate } from "react-router-dom";
 
 const convertKelvinToCelsius = (kelvin) => {
   return (kelvin - 273.15).toFixed(2);
@@ -17,15 +19,16 @@ const getTodayDate = () => {
 };
 
 const getWindDirection = (degree) => {
-  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
   const index = Math.round(degree / 45) % 8;
   return directions[index];
 };
 
-const WeatherController = () => {
+const WeatherController = ({ onLogout }) => {
   const [weatherData, setWeatherData] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const cityName = "Vancouver"; // Example city for testing, will replace with dynamic input
+  const cityName = "Vancouver"; // Example city for testing, need to replace with dynamic input
+  const navigate = useNavigate();
 
   useEffect(() => {
     const days = 1;
@@ -42,16 +45,21 @@ const WeatherController = () => {
         console.error("Error fetching weather data:", error);
       });
 
-    // Update time every second
+
     const intervalId = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, []); 
+  }, []);
 
   const getCurrentTime = () => {
     return currentTime.toLocaleTimeString();
+  };
+
+  const handleLogout = () => {
+    onLogout();
+    navigate("/login");
   };
 
   return (
@@ -70,7 +78,21 @@ const WeatherController = () => {
                   className="weather-icon"
                 />
               )}
+              <img
+                src={`${process.env.PUBLIC_URL}/images/geoweather-hub-logo.png`}
+                alt="Logo"
+                className="logo"
+              />
               <h1 className="geoWeather">GeoWeather Hub</h1>
+              <div className="logout-container">
+                <button
+                  type="button"
+                  className="btn btn-outline-light"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </div>
               <div className="weather-header">
                 <h2>{item.weather[0].main}</h2>
                 <div className="bolded-line"></div>
@@ -90,13 +112,16 @@ const WeatherController = () => {
                     type="text"
                     className="search-bar"
                     placeholder="Search City..."
-                  ></input>
-                  <img
-                    src="../images/search.png"
-                    alt="Search Icon"
-                    className="search-icon"
-                  ></img>
+                  />
+                  <button className="search-button">
+                    <img
+                      src="../images/search.png"
+                      alt="Search Icon"
+                      className="search-icon"
+                    />
+                  </button>
                 </div>
+
                 <h4 className="location">
                   {cityName}, {weatherData.city.country}
                 </h4>
@@ -133,7 +158,9 @@ const WeatherController = () => {
                   <div className="bolded-line2"></div>
                   <div className="data-row">
                     <span className="label">Wind Degree:</span>
-                    <span>{item.wind.deg}° ({windDirection})</span>
+                    <span>
+                      {item.wind.deg}° ({windDirection})
+                    </span>
                   </div>
                   <div className="bolded-line2"></div>
                   <div className="data-row">

@@ -1,14 +1,38 @@
-import './App.css';
-import React from 'react';
-import WeatherController from './weatherController'; 
+import React, { useState } from 'react';
+import WeatherController from './weatherController';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Login from './login';
+import Register from './register';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
+
+  const handleRegister = () => {
+    setIsLoggedIn(true);
+  };
+
   return (
     <div className="App">
       <main>
         <div className="bg-image">
-            <WeatherController />
+          <Router>
+            <Routes>
+              <Route path="/login" element={<Login onLogin={handleLogin} />} />
+              <Route path="/register" element={<Register onRegister={handleRegister} />} />
+              {isLoggedIn ? (
+                <Route path="/weather" element={<WeatherController onLogout={handleLogout} />} />
+              ) : null}
+            </Routes>
+          </Router>
         </div>
       </main>
     </div>
