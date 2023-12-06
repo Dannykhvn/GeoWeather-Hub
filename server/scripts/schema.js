@@ -10,7 +10,6 @@ db.serialize(() => {
     )
   `);
 
-  // Add more tables if needed
 
   console.log('Tables created successfully.');
 });
