@@ -1,16 +1,30 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './login.css'
-
-
 
 const Login = ({ onLogin }) => {
   const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login button clicked");
-    onLogin(); 
-    navigate('/weather');
+    console.log("Login button clicked", username, password);
+
+    try {
+      // Send login request to the server
+      const response = await axios.post('http://localhost:5000/api/login', { username: username, password: password });
+      
+      if (response.status === 200) {
+        // If successful, trigger onLogin and navigate to '/weather'
+        onLogin();
+        navigate('/weather');
+      }
+    } catch (error) {
+      console.error('Login failed', error.response.data.message);
+      // Handle login failure (display error message, etc.)
+    }
   };
 
   return (
@@ -25,10 +39,10 @@ const Login = ({ onLogin }) => {
 
         <form onSubmit={handleFormSubmit}>
           <div className="mb-3">
-            <input type="text" className="form-control" placeholder="Username" />
+            <input type="text" id="username" className="form-control" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
           </div>
           <div className="mb-3">
-            <input type="password" className="form-control" placeholder="Password" />
+            <input type="password" id="password" className="form-control" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)}/>
           </div>
           <button type="submit" className="btn btn-primary" onClick={handleFormSubmit}>Login</button>
         </form>

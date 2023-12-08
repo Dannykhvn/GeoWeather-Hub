@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import WeatherController from './weatherController';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Login from './login';
 import Register from './register';
@@ -26,6 +26,7 @@ function App() {
         <div className="bg-image">
           <Router>
             <Routes>
+            <Route path="/" element={<Navigate to="/register" />} />
               <Route path="/login" element={<Login onLogin={handleLogin} />} />
               <Route path="/register" element={<Register onRegister={handleRegister} />} />
               {isLoggedIn ? (

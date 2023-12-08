@@ -1,7 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const apiRoutes = require('./routes/apiRoutes'); // Import your API routes
+const session = require('express-session');
+const passport = require('./auth/passport'); 
+const apiRoutes = require('./routes/apiRoutes'); 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const db = require('./config/db'); // Require the database connection
@@ -11,6 +13,9 @@ app.use(cors());
 
 // Middleware
 app.use(bodyParser.json());
+app.use(session({ secret: '12345', resave: true, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Simple test query
 db.get("SELECT * FROM users LIMIT 1", (err, row) => {
@@ -23,6 +28,19 @@ db.get("SELECT * FROM users LIMIT 1", (err, row) => {
 
 // Use the API routes
 app.use('/api', apiRoutes);
+
+// Middleware to check if a user is authenticated
+app.use((req, res, next) => {
+  // Allow access to the registration endpoint without authentication
+  if (req.path === '/api/register') {
+    return next();
+  }
+
+  if (req.isAuthenticated()) {
+    return next();
+  }
+  res.status(401).json({ message: 'Unauthorized' });
+});
 
 // Basic route
 app.get('/', (req, res) => {
