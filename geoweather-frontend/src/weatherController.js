@@ -27,13 +27,14 @@ const getWindDirection = (degree) => {
 const WeatherController = ({ onLogout }) => {
   const [weatherData, setWeatherData] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const cityName = "Vancouver"; // Example city for testing, need to replace with dynamic input
+  const [searchInput, setSearchInput] = useState('');
+  const [searchClicked, setSearchClicked] = useState(false);
+  const [cityName, setCityName] = useState("Vancouver"); 
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const fetchWeatherData = (city) => {
     const days = 1;
-
-    const requestURL = `http://localhost:5000/api/weather/forecast?city=${cityName}&days=${days}`;
+    const requestURL = `http://localhost:5000/api/weather/forecast?city=${city}&days=${days}`;
 
     axios
       .get(requestURL)
@@ -44,14 +45,50 @@ const WeatherController = ({ onLogout }) => {
       .catch((error) => {
         console.error("Error fetching weather data:", error);
       });
+  };
 
+  const handleSearchClick = () => {
+    if (searchInput.trim() !== '') {
+      setSearchClicked(true);
+      // Update cityName with the search input
+      setCityName(searchInput);
+    }
+  };
 
+  useEffect(() => {
+    // Fetch initial weather data when the component mounts
+    fetchWeatherData(cityName);
+
+    // Set up interval to update current time
     const intervalId = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
 
+    // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
-  }, []);
+  }, [cityName]); 
+
+  useEffect(() => {
+  // Fetch weather data based on search input when searchClicked is true
+  const fetchData = async () => {
+    if (searchInput.trim() !== '') {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/weather/forecast?city=${searchInput}&days=1`
+        );
+        setWeatherData(response.data);
+        console.log("Current Weather Data:", response.data);
+      } catch (error) {
+        console.error("Error fetching weather data:", error);
+      }
+    }
+  };
+
+  if (searchInput.trim() !== '' && searchClicked) {
+    fetchData();
+    setSearchClicked(false); // Reset the searchClicked state after fetching data
+    }
+  }, [cityName, currentTime, searchInput, searchClicked]);
 
   const getCurrentTime = () => {
     return currentTime.toLocaleTimeString();
@@ -64,9 +101,11 @@ const WeatherController = ({ onLogout }) => {
 
   return (
     <>
-      {weatherData ? (
+      {weatherData && weatherData.list ? (
         weatherData.list.map((item, index) => {
           const temperature = convertKelvinToCelsius(item.main.temp);
+          const temperature_min = convertKelvinToCelsius(item.main.temp_min);
+          const temperature_max = convertKelvinToCelsius(item.main.temp_max);
           const windDirection = getWindDirection(item.wind.deg);
 
           return (
@@ -112,8 +151,18 @@ const WeatherController = ({ onLogout }) => {
                     type="text"
                     className="search-bar"
                     placeholder="Search City..."
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handleSearchClick();
+                      }
+                    }}
                   />
-                  <button className="search-button">
+                  <button
+                    className="search-button"
+                    onClick={handleSearchClick}
+                  >
                     <img
                       src="../images/search.png"
                       alt="Search Icon"
@@ -170,12 +219,12 @@ const WeatherController = ({ onLogout }) => {
                   <div className="bolded-line2"></div>
                   <div className="data-row">
                     <span className="label">Temperature Min:</span>
-                    <span className="value">{item.main.temp_min}°C</span>
+                    <span className="value">{temperature_min}°C</span>
                   </div>
                   <div className="bolded-line2"></div>
                   <div className="data-row">
                     <span className="label">Temperature Max:</span>
-                    <span className="value">{item.main.temp_max}°C</span>
+                    <span className="value">{temperature_max}°C</span>
                   </div>
                   <div className="bolded-line2"></div>
                   <div className="data-row">
